@@ -1,18 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   SafeAreaView,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 import AppInput from '../components/AppInput';
 import AppButton from '../components/AppButton';
 import { colors } from '../theme/colors';
 import { login } from '../services/authService';
 import { validateEmail, validatePassword } from '../utils/validation';
+import { useShake } from '../hooks/useShake';
 
 export default function LoginScreen({ navigation }: any) {
+
+  const passwordRef = useRef<any>(null);
+  const { shakeAnim, shake } = useShake();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -27,7 +33,10 @@ export default function LoginScreen({ navigation }: any) {
     setEmailError(emailMsg);
     setPasswordError(passwordMsg);
 
-    if (emailMsg || passwordMsg) return;
+    if (emailMsg || passwordMsg) {
+      shake();
+      return;
+    }
 
     try {
       setLoading(true);
@@ -49,26 +58,31 @@ export default function LoginScreen({ navigation }: any) {
           <Text style={styles.subtitle}>Login to continue</Text>
         </View>
 
-        <View style={styles.card}>
+        <Animated.View style={[styles.card, { transform: [{ translateX: shakeAnim }] }]}>
           <AppInput
             placeholder="Email address"
             value={email}
-            onChangeText={(text: string) => {
+            keyboardType="email-address"
+            returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current?.focus()}
+            onChangeText={(text) => {
               setEmail(text);
               setEmailError('');
             }}
-            keyboardType="email-address"
           />
           {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
 
           <AppInput
             placeholder="Password"
             value={password}
-            onChangeText={(text: string) => {
+            secureTextEntry
+            returnKeyType="done"
+            onSubmitEditing={handleLogin}
+            onChangeText={(text) => {
               setPassword(text);
               setPasswordError('');
             }}
-            secureTextEntry
+            ref={passwordRef}
           />
           {passwordError ? (
             <Text style={styles.error}>{passwordError}</Text>
@@ -91,7 +105,7 @@ export default function LoginScreen({ navigation }: any) {
               Sign up
             </Text>
           </Text>
-        </View>
+        </Animated.View>
 
       </View>
     </SafeAreaView>
@@ -112,7 +126,7 @@ const styles = StyleSheet.create({
   error: {
     color: colors.danger,
     fontSize: 13,
-    marginTop:3,
+    marginTop: 3,
     // marginBottom: 15,
     marginLeft: 4,
   },
@@ -125,5 +139,5 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: '700',
   },
-  buttonContainer:{marginTop:10}
+  buttonContainer: { marginTop: 10 }
 });

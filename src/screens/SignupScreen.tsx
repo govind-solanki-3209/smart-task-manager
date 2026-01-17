@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,10 @@ import {
 } from '../utils/validation';
 
 export default function SignupScreen({ navigation }: any) {
+  const emailRef = useRef<any>(null);
+  const passwordRef = useRef<any>(null);
+  const confirmRef = useRef<any>(null);
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -61,7 +65,9 @@ export default function SignupScreen({ navigation }: any) {
           <AppInput
             placeholder="Full name"
             value={name}
-            onChangeText={(t: string) => {
+            returnKeyType="next"
+            onSubmitEditing={() => emailRef.current?.focus()}
+            onChangeText={(t) => {
               setName(t);
               setErrors({ ...errors, name: '' });
             }}
@@ -69,12 +75,16 @@ export default function SignupScreen({ navigation }: any) {
           {errors.name && <Text style={styles.error}>{errors.name}</Text>}
 
           <AppInput
-            placeholder="Email address"
-            value={email}
-            onChangeText={(t: string) => {
-              setEmail(t);
-              setErrors({ ...errors, email: '' });
+            placeholder="Password"
+            value={password}
+            secureTextEntry
+            returnKeyType="next"
+            onSubmitEditing={() => confirmRef.current?.focus()}
+            onChangeText={(t) => {
+              setPassword(t);
+              setErrors({ ...errors, password: '' });
             }}
+            ref={passwordRef}
           />
           {errors.email && <Text style={styles.error}>{errors.email}</Text>}
 
@@ -82,11 +92,15 @@ export default function SignupScreen({ navigation }: any) {
             placeholder="Password"
             value={password}
             secureTextEntry
-            onChangeText={(t: string) => {
+            returnKeyType="next"
+            onSubmitEditing={() => confirmRef.current?.focus()}
+            onChangeText={(t) => {
               setPassword(t);
               setErrors({ ...errors, password: '' });
             }}
+            ref={passwordRef}
           />
+
           {errors.password && (
             <Text style={styles.error}>{errors.password}</Text>
           )}
@@ -95,10 +109,13 @@ export default function SignupScreen({ navigation }: any) {
             placeholder="Confirm password"
             value={confirmPassword}
             secureTextEntry
-            onChangeText={(t: string) => {
+            returnKeyType="done"
+            onSubmitEditing={handleSignup}
+            onChangeText={(t) => {
               setConfirmPassword(t);
               setErrors({ ...errors, confirmPassword: '' });
             }}
+            ref={confirmRef}
           />
           {errors.confirmPassword && (
             <Text style={styles.error}>{errors.confirmPassword}</Text>
@@ -108,7 +125,7 @@ export default function SignupScreen({ navigation }: any) {
             <ActivityIndicator size="large" color={colors.primary} />
           ) : (
             <View style={styles.buttonContainer}>
-            <AppButton title="Sign Up" onPress={handleSignup} />
+              <AppButton title="Sign Up" onPress={handleSignup} />
             </View>
           )}
 
@@ -139,7 +156,7 @@ const styles = StyleSheet.create({
   error: {
     color: colors.danger,
     fontSize: 13,
-    marginTop:3,
+    marginTop: 3,
     // marginBottom: 15,
     marginLeft: 4,
   },
@@ -152,5 +169,5 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: '700',
   },
-  buttonContainer:{marginTop:10}
+  buttonContainer: { marginTop: 10 }
 });
