@@ -1,69 +1,86 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../theme/colors';
 
-interface TaskItemProps {
-  task: {
-    id: string;
-    title: string;
-    completed: boolean;
-  };
-  onToggle: () => void;
-  onDelete: () => void;
-}
+const TaskItem = ({ task, onToggle, onDelete }: any) => {
+  const date = new Date(task.createdAt);
 
-const TaskItem: React.FC<TaskItemProps> = ({
-  task,
-  onToggle,
-  onDelete,
-}) => {
+  const formattedDate = date.toLocaleDateString();
+  const formattedTime = date.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={onToggle} style={styles.textContainer}>
-        <Text
-          style={[
-            styles.title,
-            task.completed && styles.completedText,
-          ]}
-        >
-          {task.title}
-        </Text>
+    <View style={styles.card}>
+      <TouchableOpacity onPress={onToggle} style={styles.row}>
+        <Ionicons
+          name={task.completed ? 'checkmark-circle' : 'ellipse-outline'}
+          size={22}
+          color={task.completed ? colors.primary : colors.gray}
+        />
+
+        <View style={styles.textWrap}>
+          <Text
+            style={[
+              styles.title,
+              task.completed && styles.completed,
+            ]}
+          >
+            {task.title}
+          </Text>
+
+          <Text style={styles.date}>
+            {formattedDate} • {formattedTime}
+          </Text>
+        </View>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={onDelete}>
-        <Text style={styles.delete}>Delete</Text>
+        <Ionicons name="trash-outline" size={20} color={colors.danger} />
       </TouchableOpacity>
     </View>
   );
-};
-
-export default TaskItem;
-
+}
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.white,
-    padding: 14,
-    marginVertical: 6,
-    borderRadius: 8,
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: 18,
+    padding: 16,
+    marginHorizontal: 16,
+    marginTop: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    elevation: 2,
+    elevation: 6,
   },
-  textContainer: {
+
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
   },
+
+  textWrap: {
+    marginLeft: 12,
+  },
+
   title: {
     fontSize: 16,
-    color: colors.black,
+    fontWeight: '600',
+    color: colors.textDark,
   },
-  completedText: {
+
+  completed: {
     textDecorationLine: 'line-through',
     color: colors.gray,
   },
-  delete: {
-    color: colors.danger,
-    fontWeight: '600',
-    marginLeft: 12,
+
+  date: {
+    fontSize: 12,
+    color: colors.gray,
+    marginTop: 4,
   },
 });
+export default TaskItem

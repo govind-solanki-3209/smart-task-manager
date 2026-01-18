@@ -10,7 +10,14 @@ export default function AddTaskScreen({ navigation }: any) {
   const dispatch = useDispatch();
 
   const saveTask = () => {
-    dispatch(addTask({ id: Date.now().toString(), title, completed: false }));
+    dispatch(
+      addTask({
+        id: Date.now().toString(),
+        title,
+        completed: false,
+        createdAt: Date.now(),
+      })
+    );
     navigation.goBack();
   };
 
